@@ -1,2 +1,2 @@
 # liferay-csv-template-mailer
-Liferay CSV Mail Merge
+Liferay CSV Mail Mailer
