@@ -1,0 +1,16 @@
+Bundle-Name: csv-template-mailer-service-service
+Bundle-SymbolicName: com.rivetlogic.csvtemplatemailer.service
+Bundle-Version: 1.0.0
+Liferay-Require-SchemaVersion: 1.0.0
+Liferay-Service: true
+Export-Package: \
+	com.rivetlogic.csvtemplatemailer.exception,\
+	com.rivetlogic.csvtemplatemailer.model,\
+	com.rivetlogic.csvtemplatemailer.model.impl,\
+	com.rivetlogic.csvtemplatemailer.service,\
+	com.rivetlogic.csvtemplatemailer.service.base,\
+	com.rivetlogic.csvtemplatemailer.service.http,\
+	com.rivetlogic.csvtemplatemailer.service.impl,\
+	com.rivetlogic.csvtemplatemailer.service.persistence,\
+	com.rivetlogic.csvtemplatemailer.service.persistence.impl,\
+	com.rivetlogic.csvtemplatemailer.service.util

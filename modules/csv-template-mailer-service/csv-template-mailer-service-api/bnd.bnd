@@ -1,0 +1,9 @@
+Bundle-Name: csv-template-mailer-service-api
+Bundle-SymbolicName: com.rivetlogic.csvtemplatemailer.api
+Bundle-Version: 1.0.0
+Export-Package: \
+	com.rivetlogic.csvtemplatemailer.exception,\
+	com.rivetlogic.csvtemplatemailer.model,\
+	com.rivetlogic.csvtemplatemailer.service,\
+	com.rivetlogic.csvtemplatemailer.service.persistence
+-includeresource: META-INF/service.xml=../csv-template-mailer-service-service/service.xml
