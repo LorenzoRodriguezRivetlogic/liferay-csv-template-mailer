@@ -74,8 +74,12 @@
 					
 					<div class="columns">
 						<div class="editor">
-						    <div cols="10" id="editor1" name="editor1" rows="10"  contenteditable="true"></div>
+							<liferay-ui:input-editor 
+								name="editor1" initMethod="initEditor" width="100" height="400" 
+  								resizable="true" >
+ 							</liferay-ui:input-editor>
 						</div>
+							
 						<div class="contacts">
 						    <h3>List of Droppable Tags</h3>
 						    <ul id="contactList">
@@ -124,19 +128,68 @@
 </aui:container>
 
 <aui:script>
-Liferay.on('portletReady',function(event) {    
-	if('_' + event.portletId + '_' == '<portlet:namespace/>'){
-		var elementExistsBol = !!document.getElementById("editor1");
-		if (elementExistsBol) {
-			CKEDITOR.instances.editor1.setData('<%= bckTemplate %>', function() {
-		        this.checkDirty();
-		    });
-		}
-	}
-});   
 
+(function() {
+	var tagsElements = document.getElementsByClassName("contact");
+    var CONTACTS =[];
+
+    for(var i=0; i<tagsElements.length; i++) {
+
+        var item = {};
+        var name = tagsElements[i].innerHTML;
+        name = name.toLowerCase();
+        name = name.replace(" ", "_");
+        item['name'] = '@{' + name + '}';
+
+        CONTACTS.push(item);
+    }
+
+    CKEDITOR.disableAutoInline = true;
+    CKEDITOR.plugins.registered
+    
+    if (!('hcard' in CKEDITOR.plugins.registered)) {
+    	CKEDITOR.plugins.add( 'hcard', {
+    		requires: 'widget',
+            init: function( editor ) {
+            	editor.widgets.add( 'hcard', {
+                    allowedContent: 'span(!h-card); !p-name',
+                    requiredContent: 'span(h-card)',
+                    pathName: 'hcard',
+
+                    upcast: function( el ) {
+                        return el.name == 'span' && el.hasClass( 'h-card' );
+                    }
+                });
+            	editor.addFeature( editor.widgets.registered.hcard );
+            	editor.on( 'paste', function( evt ) {
+                    var contact = evt.data.dataTransfer.getData( 'contact' );
+                    if ( !contact ) {
+                        return;
+                    }
+
+                    evt.data.dataValue = '<span class="h-card">' + contact.name + '</span>';
+                });
+            }
+    	});
+    }
+    
+    CKEDITOR.document.getById( 'contactList' ).on( 'dragstart', function( evt ) {
+    	var target = evt.data.getTarget().getAscendant( 'div', true );
+    	CKEDITOR.plugins.clipboard.initDragDataTransfer( evt );
+        var dataTransfer = evt.data.dataTransfer;
+        dataTransfer.setData( 'contact', CONTACTS[ target.data( 'contact' ) ] );
+        dataTransfer.setData( 'text/html', '@{' + target.getText().toLowerCase().replace(" ", "_") + '}' );
+    });
+    
+    CKEDITOR.config.extraPlugins = 'hcard';
+})();
+
+function <portlet:namespace/>initEditor(){
+	 return  '<%= bckTemplate %>';
+}
+ 
 function submitToPreview() {
-	var template = CKEDITOR.instances.editor1.getData();
+	var template = window.<portlet:namespace />editor1.getHTML();
 	document.getElementById("<portlet:namespace />content").value = template;
 }
 
@@ -170,13 +223,14 @@ function callServeResource(){
 				    	var label = A.one('#<portlet:namespace/>templates option:selected').attr('text');
 						document.getElementById('<portlet:namespace />name').value = label;
 						document.getElementById('<portlet:namespace />templateId').value = template;
-				     	CKEDITOR.instances.editor1.setData(this.get('responseData'));
+						window.<portlet:namespace />editor1.setHTML(this.get('responseData'));
 				     }
 				}
 			});
 		}
     });
 }
+
 function callSaveResource(){
     AUI().use('aui-base', function(A){
     	var name = A.one('#<portlet:namespace/>name').attr('value');
@@ -185,7 +239,7 @@ function callSaveResource(){
 			return;
 		}
 		
-		var template = CKEDITOR.instances.editor1.getData();
+		var template = window.<portlet:namespace />editor1.getHTML();
 		if (template === '') {
 			alert('The template cannot be empty');
 			return;
@@ -232,6 +286,7 @@ function callSaveResource(){
 		}
     });
 }
+
 function callUpdateResource(){
     AUI().use('aui-base', function(A){
     	var option = A.one('#<portlet:namespace/>templates');
@@ -246,7 +301,7 @@ function callUpdateResource(){
 			return;
 		}
 		
-		var template = CKEDITOR.instances.editor1.getData();
+		var template = window.<portlet:namespace />editor1.getHTML();
 		if (template === '') {
 			alert('The template cannot be empty');
 			return;
@@ -273,6 +328,7 @@ function callUpdateResource(){
 		});
     });
 }
+
 function callDeleteResource(){
     AUI().use('aui-base', function(A){
     	var option = A.one('#<portlet:namespace/>templates');
@@ -302,4 +358,5 @@ function callDeleteResource(){
 		});
     });
 }
+
 </aui:script>
